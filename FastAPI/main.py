@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(cars.router)
+app.include_router(cars.router)
 
 # default gateway
 @app.get("/")
