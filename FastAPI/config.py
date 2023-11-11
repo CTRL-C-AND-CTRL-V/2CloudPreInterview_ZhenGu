@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    gmaps_api_key: str
 
     # import variables from .env file
     class Config:

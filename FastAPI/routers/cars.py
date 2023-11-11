@@ -8,9 +8,9 @@ import time
 from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(
-    prefix="/cars",
     tags=['Cars']
 )
+
 @router.get("/cars", response_model=List[schemas.CarRead])
 def get_cars(db: Session = Depends(get_db)):
     return db.query(models.Car).all()
