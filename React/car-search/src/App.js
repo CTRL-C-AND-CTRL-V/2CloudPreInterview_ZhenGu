@@ -1,65 +1,74 @@
-import React, { useState } from 'react';
-import './App.css';
-import TextField from '@mui/material/TextField';
+import React, { useState, useEffect } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import api from "./api";
 
-function App() {
-  // State for each filter
-  const [make, setMake] = useState('');
-  const [model, setModel] = useState('');
-  // ... other states for filters
+function App(){
+  const [makes, setMakes] = useState([]);
+  const [selectedMake, setSelectedMake] = useState('');
+  const [families, setFamilies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleApplyFilter = () => {
-    // Logic to apply filters
-  };
-
-  const handleClearFilter = () => {
-    // Logic to clear filters
-  };
-
-  const makeop = ['Audi','BMW'];
-  const familyop = ['A1', 'A3'];
-  const yearop = ['1990', '1991']
-
+  useEffect(() => {
+    const fetchMakes = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get('/cars');
+        // Axios automatically parses the response body to JSON
+        const allMakes = [...new Set(response.data.map(car => car.make))];
+        setMakes(allMakes);
+      } catch (error) {
+        console.error('Failed to fetch makes', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchMakes();
+  }, []);
+  
+  useEffect(() => {
+    const fetchFamilies = async () => {
+      if (!selectedMake) {
+        setFamilies([]);
+        return;
+      }
+  
+      setLoading(true);
+      try {
+        const response = await api.get(`/cars?make=${selectedMake}`);
+        // Axios automatically parses the response body to JSON
+        const makeFamilies = [...new Set(response.data.map(car => car.family))];
+        setFamilies(makeFamilies);
+      } catch (error) {
+        console.error(`Failed to fetch families for make: ${selectedMake}`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchFamilies();
+  }, [selectedMake]);
 
   return (
-    <div className="App">
-      <nav>
-        {/* Navbar component */}
-      </nav>
-      <main>
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={makeop}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Make" />}
-        />
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={familyop}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Family" />}
-        />
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={yearop}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Year" />}
-        />
-        <section className="search-filters">
-          {/* Dropdowns and input fields */}
-          <button onClick={handleApplyFilter}>Apply Filter</button>
-          <button onClick={handleClearFilter}>Clear Filter</button>
-        </section>
-        <section className="stats-display">
-          {/* Display stats */}
-        </section>
-      </main>
+    <div>
+      <Autocomplete
+        options={makes}
+        loading={loading}
+        value={selectedMake}
+        onChange={(event, newValue) => {
+          setSelectedMake(newValue);
+        }}
+        renderInput={(params) => <TextField {...params} label="Make" variant="outlined" />}
+      />
+      <Autocomplete
+        options={families}
+        loading={loading}
+        disabled={!selectedMake}
+        renderInput={(params) => <TextField {...params} label="Family" variant="outlined" />}
+      />
     </div>
   );
-}
+};
 
 export default App;

@@ -13,10 +13,34 @@ router = APIRouter(
 )
 
 @router.get("/cars", response_model=List[schemas.CarRead])
-def get_cars(make: Optional[str] = None, db: Session = Depends(get_db)):
+def get_cars(
+    make: Optional[str] = None, 
+    family: Optional[str] = None, 
+    year: Optional[int] = None, 
+    db: Session = Depends(get_db)
+):
+    # Start with a base query
     query = db.query(models.Car)
-    if make:
+    
+    # Apply filters only if all are provided
+    if make and family and year:
+        query = query.filter(models.Car.make == make, 
+                             models.Car.family == family, 
+                             models.Car.year == year)
+    elif make and family and not year:
+        query = query.filter(models.Car.make == make, 
+                        models.Car.family == family)
+    # If only maker is provided, just filter by maker
+    elif make and not family and not year:
         query = query.filter(models.Car.make == make)
+    # If family or year are provided without maker, raise an error
+    elif family or year:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Filtering by model or year requires maker to be specified."
+        )
+
+    # Return the filtered list of cars
     return query.all()
 
 @router.post("/cars", response_model=List[schemas.CarRead], status_code=status.HTTP_201_CREATED)
