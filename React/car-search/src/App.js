@@ -11,11 +11,12 @@ function App(){
   const [selectedMake, setSelectedMake] = useState('');
   const [families, setFamilies] = useState([]);
   const [selectedFamily, setSelectedFamily] = useState('');
-  const [minYear, setMinYear] = useState(null);
-  const [maxYear, setMaxYear] = useState(null);
+  const [year,setYear] = useState([]);
+  const [yearMinMax, setYearMinMax] = useState([]);
   const [loading, setLoading] = useState(false);
 
 
+  /* update make */
   useEffect(() => {
     const fetchMakes = async () => {
       setLoading(true);
@@ -34,6 +35,7 @@ function App(){
     fetchMakes();
   }, []);
   
+  /* update family */
   useEffect(() => {
     const fetchFamilies = async () => {
       if (selectedMake) {
@@ -50,46 +52,69 @@ function App(){
         }
       }
     };
-  
     fetchFamilies();
   }, [selectedMake]);
 
   useEffect(() => {
-    // Fetch min and max years based on selected make and family
-    const fetchYears = async () => {
+    const fetchYearRange = async () => {
       if (selectedMake && selectedFamily) {
         setLoading(true);
         try {
           const response = await api.get(`/cars?make=${selectedMake}&family=${selectedFamily}`);
-          const yearsData = response.data.map(car => parseInt(car.year, 10)).filter(Boolean);
-          setMinYear(Math.min(...yearsData));
-          setMaxYear(Math.max(...yearsData));
+          const yearData = response.data.map(car => car.year);
+          if (yearData.length > 0) {
+            setYear([Math.min(...yearData),Math.max(...yearData)]);
+            setYearMinMax([Math.min(...yearData),Math.max(...yearData)]);
+          }
         } catch (error) {
-          console.error(`Failed to fetch years for make: ${selectedMake} and family: ${selectedFamily}`, error);
+          console.error(`Failed to fetch year range for make: ${selectedMake} and family: ${selectedFamily}`, error);
         } finally {
           setLoading(false);
         }
-      } else {
-        setMinYear(null);
-        setMaxYear(null);
       }
     };
-
-    fetchYears();
+    fetchYearRange();
   }, [selectedMake, selectedFamily]);
 
   const handleYearChange = (event, newValue) => {
-    console.log('Selected Year Range:', newValue);
+    // newValue is an array with two elements: [min, max]
+    setYear(newValue);
   };
 
-  useEffect(() => {
-    console.log(`Selected Make: ${selectedMake}, Selected Family: ${selectedFamily}`);
-    console.log(`Min Year: ${minYear}, Max Year: ${maxYear}`);
-    console.log(`Slider Disabled: ${!selectedMake || !selectedFamily || minYear === null || maxYear === null}`);
-  }, [selectedMake, selectedFamily, minYear, maxYear]);
+  const applyFilter = async () => {
+    // Collect all input field data
+    const filterParams = {
+      make: selectedMake,
+      family: selectedFamily,
+      yearRange: [year[0], year[1]],
+      // ... any other fields you want to include
+    };
+  
+    // Construct query string
+    const queryString = Object.entries(filterParams)
+      .filter(([, value]) => value != null)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+  
+    // Send request to your API
+    try {
+      const response = await api.get(`/cars/filtered?${queryString}`);
+      console.log('Filtered data:', response.data);
+    } catch (error) {
+      console.error('Failed to fetch filtered data', error);
+    }
+  };
+  
+  const clearFilter = () => {
+    // Reset all states that hold input field values
+    setSelectedMake(null);
+    setSelectedFamily(null);
+    setYear([]);
+    setYearMinMax([]);
+  };
 
   return (
-    <div>
+    <div style={{padding:'10%'}}>
       <Autocomplete
         options={makes}
         loading={loading}
@@ -112,22 +137,25 @@ function App(){
         Year Range
       </Typography>
       <Slider
-        value={typeof minYear === 'number' && typeof maxYear === 'number' ? [minYear, maxYear] : [0, 0]}
+        value={year}
         onChange={handleYearChange}
         valueLabelDisplay="auto"
-        aria-labelledby="year-slider"
-        getAriaValueText={(value) => `${value}`}
-        min={minYear}
-        max={maxYear}
-        disabled={!selectedMake || !selectedFamily || minYear === null || maxYear === null}
+        // aria-labelledby="year-slider"
+        // getAriaValueText={(value) => `${value}`}
+        min={yearMinMax[0]}
+        max={yearMinMax[1]}
+        step={1}
+        // disabled={!selectedMake || !selectedFamily || year === null }
       />
 
-      {/* When you want to show the selected range outside the slider */}
       <Box sx={{ mt: 2 }}>
         <Typography>
-          Selected range: {minYear} - {maxYear}
+          Selected range: {year[0]} - {year[1]}
         </Typography>
       </Box>
+
+      <button onClick={applyFilter}>Apply Filter</button>
+      <button onClick={clearFilter}>Clear Filter</button>
     </div>
   );
 };

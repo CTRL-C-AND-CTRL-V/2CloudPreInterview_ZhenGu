@@ -3,8 +3,6 @@ from typing import Optional
 
 # Base schema with common attributes
 class CarBase(BaseModel):
-
-    #name: str
     make: str
     family: str
     year: int
