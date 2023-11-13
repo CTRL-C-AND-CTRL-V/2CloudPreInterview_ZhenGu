@@ -14,3 +14,14 @@ router = APIRouter(
 @router.get("/cars", response_model=List[schemas.CarRead])
 def get_cars(db: Session = Depends(get_db)):
     return db.query(models.Car).all()
+
+@router.post("/cars", response_model=List[schemas.CarRead], status_code=status.HTTP_201_CREATED)
+def create_cars(cars: List[schemas.CarCreate], db: Session = Depends(get_db)):
+    new_cars = [models.Car(**car.dict()) for car in cars]
+    db.add_all(new_cars)
+    try:
+        db.commit()
+        return new_cars
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
