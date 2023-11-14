@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import Slider from '@mui/material/Slider';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Grid, Box,Container, Typography, Slider, TextField, Autocomplete, styled} from '@mui/material'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import api from "./api";
 
 function App(){
@@ -47,6 +44,27 @@ function App(){
 
   const [loading, setLoading] = useState(false);
 
+  const theme = createTheme({
+    components: {
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            height:'0px',
+            fontSize:'0.8rem'
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            fontSize: '0.8rem',
+            color:'black',
+            top:'-7px'
+          },
+        },
+      }
+    },
+  });
 
   /* update make */
   useEffect(() => {
@@ -174,91 +192,129 @@ function App(){
   };
 
   return (
-    <div style={{padding:'10%'}}>
-      <Autocomplete
-        options={makes}
-        loading={loading}
-        value={selectedMake}
-        onChange={(event, newValue) => {
-          setSelectedMake(newValue);
-        }}
-        renderInput={(params) => <TextField {...params} label="Make" variant="outlined" />}
-      />
-      <Autocomplete
-        options={families}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setSelectedFamily(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Family" variant="outlined" />}
-      />
-      <Typography id="year-slider" gutterBottom>
-        Year Range
+    <Container maxWidth="md" style={{marginTop:'5%'}}>
+      <Typography>
+        <h1>Search Used Car Prices</h1>
       </Typography>
-      <Slider
-        value={year}
-        onChange={handleYearChange}
-        valueLabelDisplay="auto"
-        // aria-labelledby="year-slider"
-        // getAriaValueText={(value) => `${value}`}
-        min={yearMinMax[0]}
-        max={yearMinMax[1]}
-        step={1}
-        // disabled={!selectedMake || !selectedFamily || year === null }
-      />
+      <Grid container spacing={1}>
+        <ThemeProvider theme={theme}>
+        <Grid item md={1.7}>
+          <Autocomplete className='autocomplete'
+          options={makes}
+          loading={loading}
+          value={selectedMake}
+          onChange={(event, newValue) => {
+            setSelectedMake(newValue);
+          }}
+          renderInput={(params) => <TextField {...params} label="Make" variant="outlined" />}
+        />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={families}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setSelectedFamily(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Family" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+            options={families}
+            loading={loading}
+            disabled={!selectedMake}
+            onChange={(event, newValue) => {
+              setSelectedFamily(newValue); // This sets the selectedFamily state
+            }}
+            renderInput={(params) => <TextField {...params} label="Year" variant="outlined" />}
+          />
+          {/* <Typography id="year-slider" gutterBottom>
+            Year Range
+          </Typography>
+          <Slider
+            value={year}
+            onChange={handleYearChange}
+            valueLabelDisplay="auto"
+            // aria-labelledby="year-slider"
+            // getAriaValueText={(value) => `${value}`}
+            min={yearMinMax[0]}
+            max={yearMinMax[1]}
+            step={1}
+            // disabled={!selectedMake || !selectedFamily || year === null }
+          />
+          <Box sx={{ mt: 2 }}>
+            <Typography>
+              Selected range: {year[0]} - {year[1]}
+            </Typography>
+          </Box> */}
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+          options={badges}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setBadgesSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Badges" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+          options={bodyType}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setBodyTypeSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Body Type" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+          options={bodyTypeConfig}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setBodyTypeConfigSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Body Type Config" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+          options={fuelType}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setFuelTypeSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Fuel Type" variant="outlined" />}
+          />
+        </Grid>
 
-      <Box sx={{ mt: 2 }}>
-        <Typography>
-          Selected range: {year[0]} - {year[1]}
-        </Typography>
-      </Box>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={transmission}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setTransmissionSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Transmission" variant="outlined" />}
+          />
+        </Grid>
+        </ThemeProvider>
+      </Grid>
+    
 
-      <Autocomplete
-        options={badges}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setBadgesSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Badges" variant="outlined" />}
-      />
-      <Autocomplete
-        options={bodyType}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setBodyTypeSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Body Type" variant="outlined" />}
-      />
-      <Autocomplete
-        options={bodyTypeConfig}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setBodyTypeConfigSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Body Type Config" variant="outlined" />}
-      />
-      <Autocomplete
-        options={fuelType}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setFuelTypeSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Fuel Type" variant="outlined" />}
-      />
-      <Autocomplete
-        options={transmission}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setTransmissionSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Transmission" variant="outlined" />}
-      />
+
+
+
+
+
       <Autocomplete
         options={engine}
         loading={loading}
@@ -351,7 +407,7 @@ function App(){
       />
       <button onClick={applyFilter}>Apply Filter</button>
       <button onClick={clearFilter}>Clear Filter</button>
-    </div>
+    </Container>
   );
 };
 
