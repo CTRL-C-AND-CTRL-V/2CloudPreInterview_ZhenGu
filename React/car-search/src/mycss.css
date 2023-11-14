@@ -1,0 +1,16 @@
+.yearBox{
+    position: absolute;
+    background-color: white;
+    z-index: 2;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    padding-bottom: 0px;
+  }
+
+  .background{
+    background-color: #f6f4f4;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    height: 100vh;
+  }

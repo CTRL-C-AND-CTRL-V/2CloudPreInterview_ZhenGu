@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box,Container, Typography, Slider, TextField, Autocomplete, styled} from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import "./mycss.css"
 import api from "./api";
 
 function App(){
@@ -42,6 +43,13 @@ function App(){
   const [saleCategorySelected, setSaleCategorySelected] = useState(null);
   const [saleDateSelected, setSaleDateSelected] = useState(null);
 
+  const [isCustomOpen, setCustomOpen] = useState(false);
+
+  // Toggle the custom box display
+  const toggleCustomBox = () => {
+    setCustomOpen(!isCustomOpen);
+  };
+
   const [loading, setLoading] = useState(false);
 
   const theme = createTheme({
@@ -50,7 +58,14 @@ function App(){
         styleOverrides: {
           input: {
             height:'0px',
-            fontSize:'0.8rem'
+            fontSize:'0.8rem',
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'white', 
           },
         },
       },
@@ -59,7 +74,7 @@ function App(){
           root: {
             fontSize: '0.8rem',
             color:'black',
-            top:'-7px'
+            top:'-7px',
           },
         },
       }
@@ -117,7 +132,7 @@ function App(){
           const yearData = carsData.map(car => car.year).filter(Boolean);
           const uniqueYearData = [...new Set(yearData)].sort((a, b) => a - b);
           const uniqueEngines = [...new Set(carsData.map(car => car.engine).filter(Number.isFinite))];
-          const uniqueCylinders = [...new Set(carsData.map(car => car.cylinders).filter(Number.isFinite))];
+          const uniqueCylinders = [...new Set(carsData.map(car => car.cylidners).filter(Number.isFinite))];
           const uniqueSeats = [...new Set(carsData.map(car => car.seat).filter(Number.isFinite))];
           const uniqueDoors = [...new Set(carsData.map(car => car.doors).filter(Number.isFinite))];
           if (uniqueYearData.length > 0) {
@@ -191,7 +206,16 @@ function App(){
     setYearMinMax([]);
   };
 
+  const generateLable = () => {
+    const[min, max] = year;
+    if (min && max){
+      return `${min}|${max}`
+    }
+    return "Year"
+  }
+
   return (
+    <div className='background'>
     <Container maxWidth="md" style={{marginTop:'5%'}}>
       <Typography>
         <h1>Search Used Car Prices</h1>
@@ -221,34 +245,33 @@ function App(){
           />
         </Grid>
         <Grid item md = {1.7}>
-          <Autocomplete
-            options={families}
-            loading={loading}
+          <TextField
             disabled={!selectedMake}
-            onChange={(event, newValue) => {
-              setSelectedFamily(newValue); // This sets the selectedFamily state
-            }}
-            renderInput={(params) => <TextField {...params} label="Year" variant="outlined" />}
+            label= {generateLable()}
+            onClick={toggleCustomBox} // Handle click to toggle custom box
+            open={false} // Keep the dropdown always closed
           />
-          {/* <Typography id="year-slider" gutterBottom>
-            Year Range
-          </Typography>
-          <Slider
-            value={year}
-            onChange={handleYearChange}
-            valueLabelDisplay="auto"
-            // aria-labelledby="year-slider"
-            // getAriaValueText={(value) => `${value}`}
-            min={yearMinMax[0]}
-            max={yearMinMax[1]}
-            step={1}
-            // disabled={!selectedMake || !selectedFamily || year === null }
-          />
-          <Box sx={{ mt: 2 }}>
-            <Typography>
-              Selected range: {year[0]} - {year[1]}
-            </Typography>
-          </Box> */}
+          {isCustomOpen && (
+            <Box className="yearBox">
+              <Slider
+                style={{width:"150px"}}
+                size='small'
+                value={year}
+                onChange={handleYearChange}
+                valueLabelDisplay="auto"
+                aria-labelledby="year-slider"
+                getAriaValueText={(value) => `${value}`}
+                min={yearMinMax[0]}
+                max={yearMinMax[1]}
+                step={1}
+                // dis
+                abled={!selectedMake || !selectedFamily || year === null }
+              />
+              <p style={{fontSize:'0.8rem'}}>
+                Selected range: {year[0]} - {year[1]}
+              </p>
+            </Box>
+          )}
         </Grid>
         <Grid item md = {1.7}>
           <Autocomplete
@@ -306,108 +329,133 @@ function App(){
           renderInput={(params) => <TextField {...params} label="Transmission" variant="outlined" />}
           />
         </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={engine}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setEngineSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Engine" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={cylidners}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setCylindersSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Cylinders" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+            options={division}
+            loading={loading}
+            disabled={!selectedMake}
+            onChange={(event, newValue) => {
+              setDivisionSelected(newValue); // This sets the selectedFamily state
+            }}
+            renderInput={(params) => <TextField {...params} label="Division" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={drive}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setDriveSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Drive" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={seat}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setSeatSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Seat" variant="outlined" />}
+          />     
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+            options={doors}
+            loading={loading}
+            disabled={!selectedMake}
+            onChange={(event, newValue) => {
+              setDoorsSelected(newValue); // This sets the selectedFamily state
+            }}
+            renderInput={(params) => <TextField {...params} label="Doors" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={odometer}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setOdometer(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Odometer" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+        <Autocomplete
+          options={state}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setStateSelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="State" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={1.7}>
+          <Autocomplete
+          options={saleCategory}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setSaleCategorySelected(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Sale Category" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+          options={saleDate}
+          loading={loading}
+          disabled={!selectedMake}
+          onChange={(event, newValue) => {
+            setSaleDate(newValue); // This sets the selectedFamily state
+          }}
+          renderInput={(params) => <TextField {...params} label="Sale Date" variant="outlined" />}
+          />
+        </Grid>
         </ThemeProvider>
       </Grid>
-    
 
 
 
 
 
 
-      <Autocomplete
-        options={engine}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setEngineSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Engine" variant="outlined" />}
-      />
-      <Autocomplete
-        options={cylidners}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setCylindersSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Cylinders" variant="outlined" />}
-      />
-      <Autocomplete
-        options={division}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setDivisionSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Division" variant="outlined" />}
-      />
-      <Autocomplete
-        options={drive}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setDriveSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Drive" variant="outlined" />}
-      />
-      <Autocomplete
-        options={seat}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setSeatSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Seat" variant="outlined" />}
-      />
-      <Autocomplete
-        options={doors}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setDoorsSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Doors" variant="outlined" />}
-      />
-      <Autocomplete
-        options={odometer}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setOdometer(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Odometer" variant="outlined" />}
-      />
-      <Autocomplete
-        options={state}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setStateSelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="State" variant="outlined" />}
-      />
-      <Autocomplete
-        options={saleCategory}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setSaleCategorySelected(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Sale Category" variant="outlined" />}
-      />
-      <Autocomplete
-        options={saleDate}
-        loading={loading}
-        disabled={!selectedMake}
-        onChange={(event, newValue) => {
-          setSaleDate(newValue); // This sets the selectedFamily state
-        }}
-        renderInput={(params) => <TextField {...params} label="Sale Date" variant="outlined" />}
-      />
+
+
+
+
+
       <button onClick={applyFilter}>Apply Filter</button>
       <button onClick={clearFilter}>Clear Filter</button>
     </Container>
+    </div>
   );
 };
 
