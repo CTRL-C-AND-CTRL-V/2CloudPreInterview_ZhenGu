@@ -5,6 +5,7 @@ import "./mycss.css"
 import api from "./api";
 
 function App(){
+  const [cars, setCars] = useState([]);
   const [makes, setMakes] = useState([]);
   const [selectedMake, setSelectedMake] = useState([]);
   const [families, setFamilies] = useState([]);
@@ -46,6 +47,8 @@ function App(){
   const [order, setOrder] = useState(null);
   const sortOption = ['Sale Date', 'Age','Odometer'];
   const orderOption = ['Asc', 'Desc'];
+
+  const [isDivVisible, setIsDivVisible] = useState(false);
 
   const [isYearOpen, setYearOpen] = useState(false);
   const [isodoOpen, setodoOpen] = useState(false);
@@ -196,6 +199,12 @@ function App(){
     setOdometer(newValue);
   };
 
+  const totalOdometerReadings = cars.reduce((accumulator, car) => {
+    return accumulator + car.odometer; // Assuming car.odometer is a number
+  }, 0);
+  
+  const averageOdometerReading = cars.length > 0 ? Math.round(totalOdometerReadings / cars.length) : 0;
+
   const applyFilter = async () => {
     // Collect all input field data
     const filterParams = {
@@ -229,7 +238,9 @@ function App(){
     // Send request to API
     try {
       const response = await api.get(`/cars/filtered?${queryString}`);
+      setCars(response.data);
       console.log('Filtered data:', response.data);
+      setIsDivVisible(true);
     } catch (error) {
       console.error('Failed to fetch filtered data', error);
     }
@@ -256,6 +267,8 @@ function App(){
     setOdometerMinMax([]);
     setStateSelected(null);
     setSaleCategorySelected(null);
+
+    setIsDivVisible(false);
   };
 
   const generateLable = (input) => {
@@ -265,6 +278,27 @@ function App(){
     }
     return `${input}`;
   }
+
+  const CarListItem = ({ car }) => {
+    return (
+      <div className="car-list-item">
+        <div style={{display:'flex',flexDirection:'column'}}>
+          <p style={{margin:"0px"}}><strong className="highlight">{car.make} {car.family} {car.year} </strong> {car.badges} {car.engine}T</p>
+          <div className='greyDetail'>
+            <div className='grey'>{car.saleCategory}</div>
+            <div className='grey'>{car.odometer} Kms</div>
+            <div className='grey'>Sold in {car.state} ({car.state})</div>
+            <div style={{marginRight:'20px'}}>Condition</div>
+            <div > Sold in {car.saleDate}</div>
+          </div>
+        </div>
+        <div className="car-actions">
+          <button className='mybtn2'>Subscribe to Reveal Price</button>
+          <button className="mybtn4">See More</button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className='background'>
@@ -298,7 +332,7 @@ function App(){
         </Grid>
         <Grid item md = {1.7}>
           <TextField
-            disabled={!selectedMake}
+            disabled={!selectedMake&&!selectedFamily}
             label= {generateLable(year)}
             onClick={toggleYearBox} // Handle click to toggle custom box
             open={false} // Keep the dropdown always closed
@@ -544,13 +578,27 @@ function App(){
           <button className= 'mybtn2' onClick={clearFilter}>Subscribe to Generate Summary Report</button>
         </Grid>
         <Grid item md = {12}>
+          {isDivVisible && 
+          <div className='mytext2'>
+            <div className='blue'>{selectedMake} {selectedFamily} status:</div>
+            <div className='second'> Record: {cars.length}</div>
+            <div className='second'>Avg Price: {averageOdometerReading} kms</div>
+            <div className='second'>Avg Age: </div>
+            <div></div>
+          </div>}
+        </Grid>
+        <Grid item md = {12}>
           <div className='mytext'>
             <div>Need a Prices People Pay Valuation Report?</div>
             <button className='mybtn3'> Get One Now</button>
           </div>
         </Grid>
+        <Grid item md = {12}>
+          {cars.map((car) => (
+            <CarListItem key={car.id} car={car} /> // Render each car using a CarListItem component
+          ))}
+        </Grid>
         </ThemeProvider>
-
       </Grid>
       
     </Container>
