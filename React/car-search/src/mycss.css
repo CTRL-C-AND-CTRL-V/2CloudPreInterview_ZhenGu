@@ -111,9 +111,24 @@
     margin-top: 10px;
     padding:10px;
   }
+
+  .car-list-item-module{
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    justify-content: space-between;
+    background-color: white;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    margin-top: 10px;
+    padding:10px;
+    
+  }
   .greyDetail{
     display: flex;
     margin-top: 5px;
+    font-size: 0.7rem;
     
   }
 

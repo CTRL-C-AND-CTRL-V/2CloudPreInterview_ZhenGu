@@ -289,8 +289,9 @@ function App(){
     return `${input}`;
   }
 
-  const CarListItem = ({ car }) => {
-    return (
+  const CarListItem = ({ car, view }) => {
+    // List layout for car item
+    const renderListView = () => (
       <div className="car-list-item">
         <div style={{display:'flex',flexDirection:'column'}}>
           <p style={{margin:"0px"}}><strong className="highlight">{car.make} {car.family} {car.year} </strong> {car.badges} {car.engine}T</p>
@@ -308,7 +309,31 @@ function App(){
         </div>
       </div>
     );
+  
+    // Module layout for car item
+    const renderModuleView = () => (
+      <div className="car-list-item-module">
+        <p><strong className="highlight">{car.make} {car.family} {car.year}</strong> {car.badges} {car.engine}T</p>
+        <div className='greyDetail'>
+            <div className='grey'>{car.saleCategory}</div>
+            <div className='grey'>{car.odometer} Kms</div>
+            <div className='grey'>Sold in {car.state} ({car.state})</div>
+        </div>
+        <div className='greyDetail' style={{margin:'10px'}}>
+          <div style={{marginRight:'20px'}}>Condition</div>
+          <div > Sold in {car.saleDate}</div>
+        </div>
+        <div className='greyDetail'>
+          <button className='mybtn2'>Subscribe to Reveal Price</button>
+          <button className="mybtn4">See More</button>
+        </div>
+      </div>
+    );
+  
+    return view === 'list' ? renderListView() : renderModuleView();
   };
+
+  
 
   return (
     <div className='background'>
@@ -617,9 +642,11 @@ function App(){
             <button className='mybtn3'> Get One Now</button>
           </div>
         </Grid>
-        <Grid item md = {12}>
+        <Grid container spacing={2}>
           {cars.map((car) => (
-            <CarListItem key={car.id} car={car} /> // Render each car using a CarListItem component
+            <Grid item xs={12} md={view === 'list' ? 12 : 4}>
+              <CarListItem car={car} view={view} />
+            </Grid>
           ))}
         </Grid>
         </ThemeProvider>
