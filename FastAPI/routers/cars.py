@@ -78,6 +78,7 @@ def get_filtered_cars(
     doors: Optional[int] = None,
     state: Optional[str] = None,
     saleCategory: Optional[str] = None,
+    description: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     # Start with a base query
@@ -118,6 +119,8 @@ def get_filtered_cars(
         query = query.filter(models.Car.state == state)
     if saleCategory:
         query = query.filter(models.Car.saleCategory == saleCategory)
+    if description:
+        query = query.filter(models.Car.description.ilike(f"%{description}%"))
 
     # Execute the query and return the results
     try:

@@ -189,12 +189,10 @@ function App(){
   }, [selectedMake, selectedFamily]);
 
   const handleYearChange = (event, newValue) => {
-    // newValue is an array with two elements: [min, max]
     setYear(newValue);
   };
 
   const handleodoChange = (event, newValue) => {
-    // newValue is an array with two elements: [min, max]
     setOdometer(newValue);
   };
 
@@ -203,8 +201,23 @@ function App(){
     const filterParams = {
       make: selectedMake,
       family: selectedFamily,
-      yearRange: [year[0], year[1]],
-      // ... any other fields you want to include
+      year_start: year[0],
+      year_end: year[1],
+      odometer_start: odometer[0],
+      odometer_end:odometer[1],
+      badges: badgesSelected,
+      bodyType: bodyTypeSelected,
+      bodyTypeConfig: bodyTypeConfigSelected,
+      fuelType:fuelTypeSelected,
+      transmission:transmissionSelected,
+      engine:engineSelected,
+      cylinders:cylindersSelected,
+      division:divisionSelected,
+      drive:driveSelected,
+      seat:seatSelected,
+      doors:doorsSelected,
+      state: stateSelected,
+      saleCategory:saleCategorySelected
     };
   
     // Construct query string
@@ -213,7 +226,7 @@ function App(){
       .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&');
   
-    // Send request to your API
+    // Send request to API
     try {
       const response = await api.get(`/cars/filtered?${queryString}`);
       console.log('Filtered data:', response.data);
@@ -228,6 +241,21 @@ function App(){
     setSelectedFamily(null);
     setYear([]);
     setYearMinMax([]);
+    setBadgesSelected(null);
+    setBodyTypeSelected(null);
+    setBodyTypeConfigSelected(null);
+    setFuelTypeSelected(null);
+    setTransmissionSelected(null);
+    setEngineSelected(null);
+    setCylindersSelected(null);
+    setDivisionSelected(null);
+    setDriveSelected(null);
+    setSeatSelected(null);
+    setDoorsSelected(null);
+    setOdometer([]);
+    setOdometerMinMax([]);
+    setStateSelected(null);
+    setSaleCategorySelected(null);
   };
 
   const generateLable = (input) => {
@@ -240,7 +268,7 @@ function App(){
 
   return (
     <div className='background'>
-    <Container maxWidth="md" style={{marginTop:'5%'}}>
+    <Container maxWidth="md" style={{marginTop:'2%'}}>
       <Typography>
         <h1>Search Used Car Prices</h1>
       </Typography>
@@ -411,6 +439,7 @@ function App(){
         <Grid item md={1.7}>
           <Autocomplete
             options={doors}
+            getOptionLabel={(option) => option.toString()}
             loading={loading}
             disabled={!selectedMake}
             onChange={(event, newValue) => {
@@ -501,21 +530,28 @@ function App(){
               renderInput={(params) => <TextField {...params} label="Order" variant="outlined" />}
           />
         </Grid>
-        <Grid item md = {6}>
-          <input className='myinput' placeholder='e.g. Metallic Paint, Power front seats, Power Sunroof, ...'/>
+
+        <Grid item md = {5}>
+          <input className='myinput'  placeholder='e.g. Metallic Paint, Power front seats, Power Sunroof, ...'/>
         </Grid>
-        <Grid item md = {2}>
+        <Grid item md = {1.5}>
           <button className= 'mybtn'onClick={applyFilter}>Apply Filter</button>
         </Grid>
-        <Grid item md = {2}>
-        <button className= 'mybtn' onClick={clearFilter}>Clear Filter</button>
+        <Grid item md = {1.5}>
+          <button className= 'mybtn' onClick={clearFilter}>Clear Filter</button>
         </Grid>
-        <Grid item md = {2}>
-        <button className= 'mybtn' onClick={clearFilter}>Clear Filter</button>
+        <Grid item md = {4}>
+          <button className= 'mybtn2' onClick={clearFilter}>Subscribe to Generate Summary Report</button>
+        </Grid>
+        <Grid item md = {12}>
+          <div className='mytext'>
+            <div>Need a Prices People Pay Valuation Report?</div>
+            <button className='mybtn3'> Get One Now</button>
+          </div>
         </Grid>
         </ThemeProvider>
+
       </Grid>
-      
       
     </Container>
     </div>
