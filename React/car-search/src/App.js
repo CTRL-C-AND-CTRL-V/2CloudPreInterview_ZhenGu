@@ -43,11 +43,16 @@ function App(){
   const [saleCategorySelected, setSaleCategorySelected] = useState(null);
   const [saleDateSelected, setSaleDateSelected] = useState(null);
 
-  const [isCustomOpen, setCustomOpen] = useState(false);
-
+  const [isYearOpen, setYearOpen] = useState(false);
+  const [isodoOpen, setodoOpen] = useState(false);
+  
   // Toggle the custom box display
-  const toggleCustomBox = () => {
-    setCustomOpen(!isCustomOpen);
+  const toggleYearBox = () => {
+    setYearOpen(!isYearOpen);
+  };
+
+  const toggleOdoBox = () => {
+    setodoOpen(!isodoOpen);
   };
 
   const [loading, setLoading] = useState(false);
@@ -131,13 +136,23 @@ function App(){
           // Assuming each car object in the response has all the fields we're interested in
           const yearData = carsData.map(car => car.year).filter(Boolean);
           const uniqueYearData = [...new Set(yearData)].sort((a, b) => a - b);
+          const odometerData = carsData.map(car => car.odometer).filter(Boolean);
+          const uniqueOdometerData = [...new Set(odometerData)].sort((a, b) => a - b);
+
           const uniqueEngines = [...new Set(carsData.map(car => car.engine).filter(Number.isFinite))];
           const uniqueCylinders = [...new Set(carsData.map(car => car.cylidners).filter(Number.isFinite))];
           const uniqueSeats = [...new Set(carsData.map(car => car.seat).filter(Number.isFinite))];
           const uniqueDoors = [...new Set(carsData.map(car => car.doors).filter(Number.isFinite))];
+
+
           if (uniqueYearData.length > 0) {
             setYear([uniqueYearData[0], uniqueYearData[uniqueYearData.length - 1]]);
             setYearMinMax([uniqueYearData[0], uniqueYearData[uniqueYearData.length - 1]]);
+          }
+
+          if (uniqueOdometerData.length > 0) {
+            setOdometer([uniqueOdometerData[0], uniqueOdometerData[uniqueYearData.length - 1]]);
+            setOdometerMinMax([uniqueOdometerData[0], uniqueOdometerData[uniqueYearData.length - 1]]);
           }
   
           // Mapping and setting state for each attribute
@@ -174,6 +189,11 @@ function App(){
     setYear(newValue);
   };
 
+  const handleodoChange = (event, newValue) => {
+    // newValue is an array with two elements: [min, max]
+    setOdometer(newValue);
+  };
+
   const applyFilter = async () => {
     // Collect all input field data
     const filterParams = {
@@ -206,12 +226,12 @@ function App(){
     setYearMinMax([]);
   };
 
-  const generateLable = () => {
-    const[min, max] = year;
+  const generateLable = (input) => {
+    const[min, max] = input;
     if (min && max){
       return `${min}|${max}`
     }
-    return "Year"
+    return `${input}`;
   }
 
   return (
@@ -247,11 +267,11 @@ function App(){
         <Grid item md = {1.7}>
           <TextField
             disabled={!selectedMake}
-            label= {generateLable()}
-            onClick={toggleCustomBox} // Handle click to toggle custom box
+            label= {generateLable(year)}
+            onClick={toggleYearBox} // Handle click to toggle custom box
             open={false} // Keep the dropdown always closed
           />
-          {isCustomOpen && (
+          {isYearOpen && (
             <Box className="yearBox">
               <Slider
                 style={{width:"150px"}}
@@ -396,15 +416,33 @@ function App(){
           />
         </Grid>
         <Grid item md={1.7}>
-          <Autocomplete
-          options={odometer}
-          loading={loading}
-          disabled={!selectedMake}
-          onChange={(event, newValue) => {
-            setOdometer(newValue); // This sets the selectedFamily state
-          }}
-          renderInput={(params) => <TextField {...params} label="Odometer" variant="outlined" />}
+          <TextField
+            disabled={!selectedMake}
+            label= {generateLable(odometer)}
+            onClick={toggleOdoBox} // Handle click to toggle custom box
+            open={false} // Keep the dropdown always closed
           />
+          {isodoOpen && (
+            <Box className="yearBox">
+              <Slider
+                style={{width:"150px"}}
+                size='small'
+                value={odometer}
+                onChange={handleodoChange}
+                valueLabelDisplay="auto"
+                aria-labelledby="year-slider"
+                getAriaValueText={(value) => `${value}`}
+                min={odometerMinMax[0]}
+                max={odometerMinMax[1]}
+                step={1}
+                // dis
+                abled={!selectedMake || !selectedFamily || year === null }
+              />
+              <p style={{fontSize:'0.8rem'}}>
+                Selected range: {odometer[0]} - {odometer[1]}
+              </p>
+            </Box>
+          )}
         </Grid>
         <Grid item md={1.7}>
         <Autocomplete
