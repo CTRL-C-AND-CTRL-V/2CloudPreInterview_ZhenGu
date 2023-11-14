@@ -6,6 +6,8 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import api from "./api";
 
 function App(){
@@ -58,6 +60,8 @@ function App(){
   const [isodoOpen, setodoOpen] = useState(false);
 
   const [view, setView] = React.useState('list');
+  const theme2 = useTheme();
+  const isSmallScreen = useMediaQuery(theme2.breakpoints.down('md'));
 
   const handleChange = (event, nextView) => {
     setView(nextView);
@@ -121,6 +125,12 @@ function App(){
   
     fetchMakes();
   }, []);
+
+  useEffect(() => {
+    if (isSmallScreen) {
+      setView('Module'); // Force 'list' view on small screens
+    }
+  }, [isSmallScreen]);
   
   /* update family */
   useEffect(() => {
@@ -290,7 +300,7 @@ function App(){
   }
 
   const CarListItem = ({ car, view }) => {
-    // List layout for car item
+    // List layout
     const renderListView = () => (
       <div className="car-list-item">
         <div style={{display:'flex',flexDirection:'column'}}>
@@ -309,8 +319,7 @@ function App(){
         </div>
       </div>
     );
-  
-    // Module layout for car item
+    // Module layout
     const renderModuleView = () => (
       <div className="car-list-item-module">
         <p><strong className="highlight">{car.make} {car.family} {car.year}</strong> {car.badges} {car.engine}T</p>
@@ -329,7 +338,6 @@ function App(){
         </div>
       </div>
     );
-  
     return view === 'list' ? renderListView() : renderModuleView();
   };
 
@@ -642,16 +650,19 @@ function App(){
             <button className='mybtn3'> Get One Now</button>
           </div>
         </Grid>
-        <Grid container spacing={2}>
-          {cars.map((car) => (
-            <Grid item xs={12} md={view === 'list' ? 12 : 4}>
-              <CarListItem car={car} view={view} />
-            </Grid>
-          ))}
-        </Grid>
         </ThemeProvider>
       </Grid>
-      
+      <Grid container spacing={1}>
+        {cars.map((car) => (
+          <Grid item 
+                xs={12} // Full width on extra small screens
+                sm={6} // Half width on small screens for "list" view, one-third for "module"
+                md={view === 'list' ? 12 : 4} // Full width on medium screens for "list" view, one-third for "module"
+                key={car.id}>
+            <CarListItem car={car} view={view} />
+          </Grid>
+        ))}
+      </Grid>
     </Container>
     </div>
   );
