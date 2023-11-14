@@ -42,6 +42,10 @@ function App(){
   const [stateSelected, setStateSelected] = useState(null);
   const [saleCategorySelected, setSaleCategorySelected] = useState(null);
   const [saleDateSelected, setSaleDateSelected] = useState(null);
+  const [sort,setSort] = useState(null);
+  const [order, setOrder] = useState(null);
+  const sortOption = ['Sale Date', 'Age','Odometer'];
+  const orderOption = ['Asc', 'Desc'];
 
   const [isYearOpen, setYearOpen] = useState(false);
   const [isodoOpen, setodoOpen] = useState(false);
@@ -477,21 +481,42 @@ function App(){
           renderInput={(params) => <TextField {...params} label="Sale Date" variant="outlined" />}
           />
         </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+            options={sortOption}
+            loading={loading}
+            onChange={(event, newValue) => {
+              setSort(newValue); 
+            }}
+            renderInput={(params) => <TextField {...params} label="Sort" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {1.7}>
+          <Autocomplete
+              options={orderOption}
+              loading={loading}
+              onChange={(event, newValue) => {
+                setOrder(newValue); 
+              }}
+              renderInput={(params) => <TextField {...params} label="Order" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md = {6}>
+          <input className='myinput' placeholder='e.g. Metallic Paint, Power front seats, Power Sunroof, ...'/>
+        </Grid>
+        <Grid item md = {2}>
+          <button className= 'mybtn'onClick={applyFilter}>Apply Filter</button>
+        </Grid>
+        <Grid item md = {2}>
+        <button className= 'mybtn' onClick={clearFilter}>Clear Filter</button>
+        </Grid>
+        <Grid item md = {2}>
+        <button className= 'mybtn' onClick={clearFilter}>Clear Filter</button>
+        </Grid>
         </ThemeProvider>
       </Grid>
-
-
-
-
-
-
-
-
-
-
-
-      <button onClick={applyFilter}>Apply Filter</button>
-      <button onClick={clearFilter}>Clear Filter</button>
+      
+      
     </Container>
     </div>
   );
