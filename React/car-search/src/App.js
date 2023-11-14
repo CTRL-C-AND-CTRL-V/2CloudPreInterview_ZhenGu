@@ -289,6 +289,7 @@ function App(){
     setSaleCategorySelected(null);
 
     setIsDivVisible(false);
+    setCars([]);
   };
 
   const generateLable = (input) => {
@@ -341,6 +342,15 @@ function App(){
     return view === 'list' ? renderListView() : renderModuleView();
   };
 
+  const filterView = (view) => {
+    const renderBig = () =>{
+
+    }
+    const renderSmall = () =>{
+      
+    }
+    return view === 'list' ? renderBig() : renderSmall();
+  }
   
 
   return (
@@ -644,14 +654,16 @@ function App(){
             </div>
           </div>}
         </Grid>
-        <Grid item md = {12}>
-          <div className='mytext'>
-            <div>Need a Prices People Pay Valuation Report?</div>
-            <button className='mybtn3'> Get One Now</button>
-          </div>
-        </Grid>
         </ThemeProvider>
       </Grid>
+      <Grid container>
+          <Grid item md = {12} sm = {12} xs = {12}>
+            <div className='mytext'>
+              <div>Need a Prices People Pay Valuation Report?</div>
+              <button className='mybtn3'> Get One Now</button>
+            </div>
+          </Grid>
+        </Grid>
       <Grid container spacing={1}>
         {cars.map((car) => (
           <Grid item 
