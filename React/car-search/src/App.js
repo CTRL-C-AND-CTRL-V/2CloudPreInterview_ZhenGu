@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Box,Container, Typography, Slider, TextField, Autocomplete, styled} from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import "./mycss.css"
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import api from "./api";
 
 function App(){
@@ -52,6 +56,12 @@ function App(){
 
   const [isYearOpen, setYearOpen] = useState(false);
   const [isodoOpen, setodoOpen] = useState(false);
+
+  const [view, setView] = React.useState('list');
+
+  const handleChange = (event, nextView) => {
+    setView(nextView);
+  };
   
   // Toggle the custom box display
   const toggleYearBox = () => {
@@ -581,10 +591,24 @@ function App(){
           {isDivVisible && 
           <div className='mytext2'>
             <div className='blue'>{selectedMake} {selectedFamily} status:</div>
-            <div className='second'> Record: {cars.length}</div>
-            <div className='second'>Avg Price: {averageOdometerReading} kms</div>
-            <div className='second'>Avg Age: </div>
-            <div></div>
+            <div> Record: {cars.length}</div>
+            <div>Avg Price: {averageOdometerReading} kms</div>
+            <div>Avg Age: </div>
+            <div>
+              <ToggleButtonGroup
+                size='small'
+                value={view}
+                exclusive
+                onChange={handleChange}
+              >
+                <ToggleButton value="list" aria-label="list">
+                  <ViewListIcon />
+                </ToggleButton>
+                <ToggleButton value="module" aria-label="module">
+                  <ViewModuleIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </div>
           </div>}
         </Grid>
         <Grid item md = {12}>
